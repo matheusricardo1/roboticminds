@@ -1,0 +1,93 @@
+{% extends 'robotic/base.html' %}
+
+{% block title %}
+	Administração
+{% endblock %}
+
+{% block content %}
+    <style>
+        li.user_activate_True{
+            background-color: limegreen;
+        }
+        li.user_activate_False{
+            background-color: red;
+        }
+    </style>
+	<main>
+    <div>
+        <h4>Você está acessando a página de root como: {{ request.user.username }}</h4>
+    </div>
+        <ul>
+            {% for user_robotic in user_to_activate %}
+                
+                <li id="user_activate_id_{{ user_robotic.id }}" class="user_activate_{{ user_robotic.is_active }}" >{{ user_robotic.user.username }} - {{ user_robotic.role|title }} <button  id="user_activate_button_id_{{ user_robotic.id }}" onclick="activate('{{ user_robotic.id }}')">Ativar</button>
+                </li>
+            {% endfor %}
+        </ul>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const listItems = document.querySelectorAll('ul li');
+            listItems.forEach(function(item) {
+                const button = item.querySelector('button');
+                const liClass = item.className;
+                
+                if (liClass === "user_activate_False" || liClass === "user_activate_false") {
+                    button.innerText = "Ativar";
+                } else if (liClass === "user_activate_True" || liClass === "user_activate_true") {
+                    button.innerText = "Desativar";
+                }
+            });
+        });
+        function activate(id){
+            const button = document.getElementById('user_activate_button_id_' + id)
+            const li = document.getElementById('user_activate_id_' + id)
+            const li_class = li.className
+            let is_active
+
+            if(li_class === "user_activate_False"){
+                is_active = false
+            }else if(li_class === "user_activate_True"){
+                is_active = true
+            }else{
+                is_active = null
+            }
+
+            fetch(`/root/active/${id}/`, {
+                 method: 'POST',
+                 headers: {
+                     'Content-Type': 'application/json',
+                     'X-CSRFToken': '{{ csrf_token }}',  // Certifique-se de obter o token CSRF do seu template
+                 },
+                 body: JSON.stringify({ 'is_active': is_active })
+             })
+            .then(response => {
+                 if (response.ok) {
+                     console.log(response)
+                     return response.json();
+                 } else {
+                     throw new Error('Network response was not ok.');
+                 }
+            })
+            .then(data => {
+                console.log(data)
+                 if (data.message === 'User has been activated' || data.message === 'User has been deactivated') {
+                     if (is_active === true) {
+                         li.classList.remove(li_class);
+                         li.classList.add('user_activate_False');
+                         button.innerText = "Ativar";
+                     } else if (is_active === false) {
+                         li.classList.remove(li_class);
+                         li.classList.add('user_activate_True');
+                         button.innerText = "Desativar";
+                     }
+                 }
+            })
+            .catch(error => {
+                 console.error('There has been a problem with your fetch operation:', error);
+            });
+
+        }
+    </script>
+{% endblock %}

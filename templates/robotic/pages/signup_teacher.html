@@ -1,0 +1,24 @@
+{% extends "robotic/pages/signup_base.html" %}
+{% load static %}
+
+{% block title_login %}{{ page_name }}{% endblock title_login %}
+
+{% block login_type %}Professor{% endblock login_type %}
+
+{% block login_form %}
+    
+{% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+    
+<form action="" method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Registrar-se!</button>
+</form>
+<p>Criar conta como aluno? <a href="{% url "robotic:signup_student" %}">Clique aqui</a></p>
+{% endblock login_form %}

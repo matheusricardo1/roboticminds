@@ -1,0 +1,15 @@
+{% extends 'robotic/base.html' %}
+
+{% block title %}
+	Conta Não Autorizada
+{% endblock %}
+
+{% block content %}
+	<div>
+        <h3>
+            Erro Ao Logar:<br> 
+            Sua conta precisa ser autorizada por um Administrador da Robotic!
+        </h3>
+        <p><a href="{% url 'robotic:login_student' %}">Clique aqui para voltar ao Login</a></p>
+    </div>
+{% endblock %}

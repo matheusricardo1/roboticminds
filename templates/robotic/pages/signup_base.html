@@ -1,0 +1,16 @@
+{% extends "robotic/base.html" %}
+{% load static %}
+
+{% block title %}
+{% block title_login %}{% endblock title_login %}
+{% endblock title %}
+
+{% block content %}
+<main>
+    <div>Criar conta como {% block login_type %}{% endblock login_type %}</div>
+   
+    {% block login_form %}
+    {% endblock login_form %}
+    <p>Já tem uma conta? <a href="{% url "robotic:login_teacher" %}">Clique aqui para entrar</a></p>
+</main>
+{% endblock content %}

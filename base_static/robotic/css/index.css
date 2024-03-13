@@ -1,0 +1,200 @@
+
+html,body{
+    margin: 0%;
+    padding: 0%;
+    background-color: #403F44;
+    font-family: Yaro Op;
+    
+}
+
+/* HOME */
+
+/* NAVBAR */
+
+.navbar-toggler-icon {
+    color: white;
+  }
+
+  .navbar-toggler {
+    text-align: center;
+  }
+
+  .navbar-collapse {
+    text-align: center;
+  }
+
+
+.navbar{
+    background-color: #403F44;
+    margin: 20px 20px;
+}
+
+.navbar-nav .nav-link {
+    color: white;
+    position: relative;
+    transition: color 0.3s;
+    margin: auto;
+}
+
+.navbar-nav .nav-link:before {
+    content: "";
+    position: absolute;
+    bottom: 0px; /* Ajuste a margem inferior conforme necessário */
+    left: 0;
+    right: 0;
+    height: 2px; /* Altura do sublinhado */
+    background: linear-gradient(90deg, #49c1ea, #5f74b7); /* Degradê de cores */
+    transform-origin: 0% 50%;
+    transform: scaleX(0); /* Inicia sem sublinhado */
+    transition: transform 0.3s;
+}
+
+.navbar-nav .nav-link:hover {
+    color: #bdbdbd; /* Cor que você deseja quando hover */
+}
+
+.navbar-nav .nav-link:hover:before {
+    transform: scaleX(1); /* Exibe o sublinhado */
+}
+
+/* PARTE-1 */
+
+.central-container{
+    margin-top: 100px;
+    max-width: 70%;
+    justify-content: center;
+}
+
+.conteudo-direita{
+    color: white;
+    font-size: 40px;
+    font-weight: bold;
+}
+
+.conteudo-esquerda{
+    align-items: center;
+    justify-content: center;
+}
+
+.btn{
+    font-size: 15px;
+    font-weight: bold;
+    color: white;
+    background:linear-gradient(90deg,  #49c1ea, #5f74b7);
+    border-radius: 25px;
+
+}
+
+.img-engrenagem_1 {
+    max-width: 20%;
+    height: auto;
+    margin-top: 75px;
+ 
+  }
+
+
+.img-engrenagem_2 {
+    max-width: 20%;
+    height: auto;
+    margin-top: 75px;
+  }
+
+  /* PARTE-2 */
+
+.PARTE-2{
+    background-color: #F0EFEB;
+    justify-content: center;
+    align-items: center;
+}
+
+.imgLogoColorida{
+    width: 50%;
+}
+
+.txtParte2{
+    max-width: 350px;
+    margin: auto auto 45px;
+    
+}
+
+/* PARTE-3 */
+
+.parte3{
+    background-color: #403F44;
+}
+
+.imgLogoNegativa{
+    max-width:20%;
+    margin-left: 50px;
+}
+
+.custom-card{   
+    background-color: transparent;
+    border: none;
+    color: white;
+    text-align: center;
+}
+
+.card-img-top{
+    border-radius: 15px;
+}
+
+/* Divisoria */
+
+.divisoria{
+    background-color: white;
+    color: white;
+    height: 80px;
+}
+
+/* PARTE-4 */
+
+.PARTE-4{
+    background-color: #49C1EA;
+}
+
+.custom-card-pt4{
+    background-color: transparent;
+    border: 10px solid white;
+    border-radius: 50%;
+    color: white;
+    overflow: hidden;
+    height: auto;
+}
+
+.custom-card-pt4 img {
+    width: 100%; /* Garantir que a imagem ocupe 100% da largura do contêiner */
+    height: auto; /* Manter a proporção original da imagem */
+    display: block; /* Remover espaços em branco adicionais que podem surgir */
+}
+
+/* PARTE-5 */
+
+.PARTE-5{
+
+    background-image: url("../images/imgRoboticLego.png");
+    background-size: auto;
+    background-position: center;
+    background-repeat: no-repeat;
+    
+}
+
+
+.imgP5{
+    max-width: 50%;
+}
+
+.custom-forms{
+    color: white;
+}
+
+
+
+
+
+  
+  
+  
+
+
+

@@ -1,0 +1,192 @@
+@font-face {
+    font-family: 'Yaro St';
+    src: url('YaroSt-Thin.eot');
+    src: local('Yaro St Thin'), local('YaroSt-Thin'),
+        url('YaroSt-Thin.eot?#iefix') format('embedded-opentype'),
+        url('YaroSt-Thin.woff2') format('woff2'),
+        url('YaroSt-Thin.woff') format('woff'),
+        url('YaroSt-Thin.ttf') format('truetype');
+    font-weight: 100;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Yaro Cut';
+    src: url('YaroCut-Black.eot');
+    src: local('Yaro Cut Black'), local('YaroCut-Black'),
+        url('YaroCut-Black.eot?#iefix') format('embedded-opentype'),
+        url('YaroCut-Black.woff2') format('woff2'),
+        url('YaroCut-Black.woff') format('woff'),
+        url('YaroCut-Black.ttf') format('truetype');
+    font-weight: 900;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Yaro St';
+    src: url('YaroSt.eot');
+    src: local('Yaro St'), local('YaroSt'),
+        url('YaroSt.eot?#iefix') format('embedded-opentype'),
+        url('YaroSt.woff2') format('woff2'),
+        url('YaroSt.woff') format('woff'),
+        url('YaroSt.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Yaro St';
+    src: url('YaroSt-Black.eot');
+    src: local('Yaro St Black'), local('YaroSt-Black'),
+        url('YaroSt-Black.eot?#iefix') format('embedded-opentype'),
+        url('YaroSt-Black.woff2') format('woff2'),
+        url('YaroSt-Black.woff') format('woff'),
+        url('YaroSt-Black.ttf') format('truetype');
+    font-weight: 900;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Yaro Rg';
+    src: url('YaroRg.eot');
+    src: local('Yaro Rg'), local('YaroRg'),
+        url('YaroRg.eot?#iefix') format('embedded-opentype'),
+        url('YaroRg.woff2') format('woff2'),
+        url('YaroRg.woff') format('woff'),
+        url('YaroRg.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Yaro Rg';
+    src: url('YaroRg-Thin.eot');
+    src: local('Yaro Rg Thin'), local('YaroRg-Thin'),
+        url('YaroRg-Thin.eot?#iefix') format('embedded-opentype'),
+        url('YaroRg-Thin.woff2') format('woff2'),
+        url('YaroRg-Thin.woff') format('woff'),
+        url('YaroRg-Thin.ttf') format('truetype');
+    font-weight: 100;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Yaro Rg';
+    src: url('YaroRg-Bold.eot');
+    src: local('Yaro Rg Bold'), local('YaroRg-Bold'),
+        url('YaroRg-Bold.eot?#iefix') format('embedded-opentype'),
+        url('YaroRg-Bold.woff2') format('woff2'),
+        url('YaroRg-Bold.woff') format('woff'),
+        url('YaroRg-Bold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Yaro Op';
+    src: url('YaroOp-Bold.eot');
+    src: local('Yaro Op Bold'), local('YaroOp-Bold'),
+        url('YaroOp-Bold.eot?#iefix') format('embedded-opentype'),
+        url('YaroOp-Bold.woff2') format('woff2'),
+        url('YaroOp-Bold.woff') format('woff'),
+        url('YaroOp-Bold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Yaro St';
+    src: url('YaroSt-Bold.eot');
+    src: local('Yaro St Bold'), local('YaroSt-Bold'),
+        url('YaroSt-Bold.eot?#iefix') format('embedded-opentype'),
+        url('YaroSt-Bold.woff2') format('woff2'),
+        url('YaroSt-Bold.woff') format('woff'),
+        url('YaroSt-Bold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Yaro Op';
+    src: url('YaroOp-Black.eot');
+    src: local('Yaro Op Black'), local('YaroOp-Black'),
+        url('YaroOp-Black.eot?#iefix') format('embedded-opentype'),
+        url('YaroOp-Black.woff2') format('woff2'),
+        url('YaroOp-Black.woff') format('woff'),
+        url('YaroOp-Black.ttf') format('truetype');
+    font-weight: 900;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Yaro Cut';
+    src: url('YaroCut-Thin.eot');
+    src: local('Yaro Cut Thin'), local('YaroCut-Thin'),
+        url('YaroCut-Thin.eot?#iefix') format('embedded-opentype'),
+        url('YaroCut-Thin.woff2') format('woff2'),
+        url('YaroCut-Thin.woff') format('woff'),
+        url('YaroCut-Thin.ttf') format('truetype');
+    font-weight: 100;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Yaro Op';
+    src: url('YaroOp-Thin.eot');
+    src: local('Yaro Op Thin'), local('YaroOp-Thin'),
+        url('YaroOp-Thin.eot?#iefix') format('embedded-opentype'),
+        url('YaroOp-Thin.woff2') format('woff2'),
+        url('YaroOp-Thin.woff') format('woff'),
+        url('YaroOp-Thin.ttf') format('truetype');
+    font-weight: 100;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Yaro Rg';
+    src: url('YaroRg-Black.eot');
+    src: local('Yaro Rg Black'), local('YaroRg-Black'),
+        url('YaroRg-Black.eot?#iefix') format('embedded-opentype'),
+        url('YaroRg-Black.woff2') format('woff2'),
+        url('YaroRg-Black.woff') format('woff'),
+        url('YaroRg-Black.ttf') format('truetype');
+    font-weight: 900;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Yaro Cut';
+    src: url('YaroCut-Bold.eot');
+    src: local('Yaro Cut Bold'), local('YaroCut-Bold'),
+        url('YaroCut-Bold.eot?#iefix') format('embedded-opentype'),
+        url('YaroCut-Bold.woff2') format('woff2'),
+        url('YaroCut-Bold.woff') format('woff'),
+        url('YaroCut-Bold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Yaro Cut';
+    src: url('YaroCut.eot');
+    src: local('Yaro Cut'), local('YaroCut'),
+        url('YaroCut.eot?#iefix') format('embedded-opentype'),
+        url('YaroCut.woff2') format('woff2'),
+        url('YaroCut.woff') format('woff'),
+        url('YaroCut.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Yaro Op';
+    src: url('YaroOp.eot');
+    src: local('Yaro Op'), local('YaroOp'),
+        url('YaroOp.eot?#iefix') format('embedded-opentype'),
+        url('YaroOp.woff2') format('woff2'),
+        url('YaroOp.woff') format('woff'),
+        url('YaroOp.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+

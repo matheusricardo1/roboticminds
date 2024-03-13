@@ -1,0 +1,18 @@
+{% load static %}
+<link href="{% static 'robotic/css/spop.css' %}" rel="stylesheet">
+<!-- Even better, SamallPop is made with scss,
+     @import to your style.scss -->
+<script src="{% static 'robotic/js/spop.js' %}"></script>
+
+{% for message in messages %}
+<script>
+    //spop('{{message}} {{message.tags}}');
+    spop({
+        template: '{{message}}',
+        position  : 'bottom-right',
+        style: '{{message.tags}}',
+        autoclose: 7000,
+    });
+</script>
+{% endfor %}
+
