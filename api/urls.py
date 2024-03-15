@@ -1,8 +1,9 @@
-from django.urls import path
+from django.urls import path, re_path
 from . import views
 
 app_name = 'api'
 
 urlpatterns = [
-    path('alunos/', views.alunos, name="alunos"),
+    re_path(r'^users/$', views.users, name="users"),
+    re_path(r'^users/([0-9]+)$', views.users, name="users"),
 ]

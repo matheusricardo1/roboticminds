@@ -16,15 +16,16 @@ class RoboticUser(AbstractUser):
         (STUDENT, 'Student'),
     ]
     
-    full_name = models.CharField(max_length=255)
+    full_name = models.CharField(max_length=255, blank=True)
     mini_bio = models.TextField(blank=True)
-    cpf = models.CharField(max_length=11)
-    registration = models.CharField(max_length=11)
-    foto_perfil = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
-    data_nasc = models.DateField(null=True)
+    cpf = models.CharField(max_length=11, blank=True)
+    registration = models.CharField(max_length=11, blank=True)
+    profile_picture = models.ImageField(upload_to='profile_pics/', blank=True)
+    birth_date = models.DateField(blank=True)
     level_access = models.CharField(max_length=20, choices=LEVEL_CHOICES, default=STUDENT)
-    sex = models.CharField(max_length=1)
-    school = models.ForeignKey(School, on_delete=models.CASCADE, null=True)
+    sex = models.CharField(max_length=1, blank=True)
+    school = models.ForeignKey(School, on_delete=models.CASCADE, blank=True)
+    is_activated_by_admin = models.BooleanField(default=False)
 
 class Certificate(models.Model):
     user = models.ForeignKey(RoboticUser, on_delete=models.CASCADE)

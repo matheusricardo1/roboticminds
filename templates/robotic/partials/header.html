@@ -33,11 +33,11 @@
             <a class="nav-link " href="">{{user.username}}</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link " href="{% url 'robotic:logout_account' %}">LOGOUT</a>
+            <a class="nav-link " href="{% url 'robotic:logout' %}">LOGOUT</a>
           </li>
           {% else %}
           <li class="nav-item">
-            <a class="nav-link " href="{% url 'robotic:login_student' %}">LOGIN</a>
+            <a class="nav-link " href="{% url 'robotic:login' %}">LOGIN</a>
           </li>
           {% endif %}
           

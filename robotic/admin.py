@@ -11,7 +11,7 @@ class RoboticUserAdmin(UserAdmin):
     list_display = ['level_access', 'username', 'full_name', 'registration']
     fieldsets = (
         ('Robotic', {
-            'fields': ('username', 'first_name', 'last_name', 'full_name', 'cpf', 'registration', 'email', 'password', 'level_access', 'foto_perfil', 'data_nasc'),
+            'fields': ('username', 'first_name', 'last_name', 'full_name', 'cpf', 'registration', 'email', 'password', 'level_access', 'profile_picture', 'birth_date', 'is_activated_by_admin'),
         }),
         ('Admin', {
             'fields': ('is_active', 'is_staff', 'is_superuser'),

@@ -1,0 +1,19 @@
+{% extends "robotic/base.html" %}
+
+{% block title  %}Cadastrar{% endblock title %}
+
+{% block content %}
+{% if messages %}
+    {% for message in messages %}
+        {{ message }}
+    {% endfor %}
+{% endif %}
+
+<h3>Tela de Login</h3>
+<form action="" method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Cadastrar!</button>
+</form>
+<p>Já tem uma conta? <a href="{% url 'robotic:login' %}">Entrar!</a></p>
+{% endblock content %}

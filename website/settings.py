@@ -23,6 +23,7 @@ INSTALLED_APPS = [
     'api',
     'corsheaders',
     'rest_framework',
+    'rest_framework_simplejwt',
     'rolepermissions',
 ]
 
@@ -37,6 +38,18 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 CORS_ORIGIN_ALLOW_ALL = True
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
+
+SIMPLE_JWT = {
+    'SIGNING_KEY': SECRET_KEY, 
+    'ALGORITHM': 'HS256', 
+}
+
 ROOT_URLCONF = 'website.urls'
 
 TEMPLATES = [
