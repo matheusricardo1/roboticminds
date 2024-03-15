@@ -5,22 +5,16 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
 from .models import RoboticUser
-from .forms import LoginRoboticForm, RegisterRoboticForm
+from .forms import RoboticLoginForm, RoboticRegisterForm
 from django.db.models import Q
 
 
 def index(request):
     user = request.user
-    robotic_user = None
-
-    if user.is_authenticated:
-        robotic_user = RoboticUser.objects.get(user=request.user)
 
     return render(request, 'robotic/pages/index.html', {
         'page_name': 'Home',
         'user': user,
-        'robotic_user': robotic_user,
-
     })
 
 
@@ -29,7 +23,7 @@ def login_student(request):
         messages.warning(request, 'Você já está logado!')
         return redirect('robotic:index')
     if request.method == 'POST':
-        form = LoginRoboticForm(request.POST)
+        form = RoboticLoginForm(request.POST)
         if form.is_valid():
             cpf = form.cleaned_data['cpf']
             password = form.cleaned_data['password']
@@ -56,7 +50,7 @@ def login_student(request):
                 messages.error(request, 'Cpf ou senha inválidos.')
                 return redirect('robotic:login_student')
     else:
-        form = LoginRoboticForm()
+        form = RoboticLoginForm()
         return render(request, 'robotic/pages/login_student.html', {
             'page_name': 'Aluno',
             'form': form,
@@ -68,7 +62,7 @@ def login_teacher(request):
         messages.warning(request, 'Você já está logado!')
         return redirect('robotic:index')
     if request.method == 'POST':
-        form = LoginRoboticForm(request.POST)
+        form = RoboticLoginForm(request.POST)
         if form.is_valid():
             cpf = form.cleaned_data['cpf']
             password = form.cleaned_data['password']
@@ -91,7 +85,7 @@ def login_teacher(request):
                 messages.error(request, 'Cpf ou senha inválidos.')
                 return redirect('robotic:login_teacher')
     else:
-        form = LoginRoboticForm()
+        form = RoboticLoginForm()
     return render(request, 'robotic/pages/login_teacher.html', {
         'page_name': 'Professor',
         'form': form,
@@ -103,7 +97,7 @@ def signup_student(request):
         messages.warning(request, 'Você já está logado!')
         return redirect('robotic:index')
     if request.method == "POST":
-        form = RegisterRoboticForm(request.POST)
+        form = RoboticRegisterForm(request.POST)
         if form.is_valid():
             username = form.cleaned_data['username']
             fullname = form.cleaned_data['fullname']
@@ -122,7 +116,7 @@ def signup_student(request):
                 user_robotic.save()
                 return redirect('robotic:index', )
     else:
-        form = RegisterRoboticForm()
+        form = RoboticRegisterForm()
     return render(request, 'robotic/pages/signup_student.html', {
         'page_name': 'Aluno',
         'form': form,
@@ -134,7 +128,7 @@ def signup_teacher(request):
         messages.warning(request, 'Você já está logado!')
         return redirect('robotic:index')
     if request.method == "POST":
-        form = RegisterRoboticForm(request.POST)
+        form = RoboticRegisterForm(request.POST)
         if form.is_valid():
             username = form.cleaned_data['username']
             fullname = form.cleaned_data['fullname']
@@ -154,7 +148,7 @@ def signup_teacher(request):
 
                 return redirect('robotic:index', )
     else:
-        form = RegisterRoboticForm()
+        form = RoboticRegisterForm()
         return render(request, 'robotic/pages/signup_teacher.html', {
             'page_name': 'Professor',
             'form': form,

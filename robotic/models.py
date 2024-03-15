@@ -1,41 +1,38 @@
-from django.contrib.auth.models import AbstractUser, User
 from django.db import models
+from django.contrib.auth.models import AbstractUser
 
+class School(models.Model):
+    name = models.CharField(max_length=255)
+    phone_contact = models.CharField(max_length=60, null=True)
+    phone_number = models.CharField(max_length=15)
 
-class PreviousSite(models.Model):
-    image = models.ImageField(upload_to='previous_sites_images/')
-    description = models.TextField()
-    developer_info = models.CharField(max_length=100)
-    site_link = models.URLField()
-
-    def __str__(self):
-        return f"Site Anterior - {self.id}"
-
-
-class Project(models.Model):
-    title = models.CharField(max_length=100)
-    description = models.TextField()
-    is_current = models.BooleanField(default=True)
-
-    def __str__(self):
-        return self.title
-
-
-class RoboticUser(models.Model):
-    CHOICES = [
-        ("teacher", 'Teacher'),
-        ("staff", 'Staff'),
-        ("student", 'Student'),
+class RoboticUser(AbstractUser):
+    TEACHER = 'teacher'
+    STAFF = 'staff'
+    STUDENT = 'student'
+    LEVEL_CHOICES = [
+        (TEACHER, 'Teacher'),
+        (STAFF, 'Staff'),
+        (STUDENT, 'Student'),
     ]
-
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-    fullname = models.CharField(max_length=255)
-    cpf = models.CharField(max_length=11, unique=True)
+    
+    full_name = models.CharField(max_length=255)
     mini_bio = models.TextField(blank=True)
-    role = models.CharField(max_length=10, choices=CHOICES, default="student")
-    profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True)
-    has_certificate = models.BooleanField(default=False)
-    is_active = models.BooleanField(default=False)
+    cpf = models.CharField(max_length=11)
+    registration = models.CharField(max_length=11)
+    foto_perfil = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
+    data_nasc = models.DateField(null=True)
+    level_access = models.CharField(max_length=20, choices=LEVEL_CHOICES, default=STUDENT)
+    sex = models.CharField(max_length=1)
+    school = models.ForeignKey(School, on_delete=models.CASCADE, null=True)
 
-    def __str__(self):
-        return f'RoboticUser - {self.user.username}'
+class Certificate(models.Model):
+    user = models.ForeignKey(RoboticUser, on_delete=models.CASCADE)
+    key = models.CharField(max_length=255)
+    certificate_date = models.DateField(auto_now_add=True, null=True)
+    year = models.CharField(max_length=4)
+
+class Phone(models.Model):
+    number = models.CharField(max_length=15)
+    whatsapp = models.BooleanField()
+    user_phone = models.ForeignKey(RoboticUser, on_delete=models.CASCADE)
