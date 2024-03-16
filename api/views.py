@@ -6,9 +6,10 @@ from rest_framework.permissions import IsAuthenticated
 from robotic.models import RoboticUser
 from api.serializers import RoboticUserSerializer
 
+
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
-@permission_classes([IsAuthenticated])
-def users(request, id=None):
+#@permission_classes([IsAuthenticated])
+def users(request, id=0):
     if request.method == 'GET':
         users = RoboticUser.objects.all().order_by("-id")
         user_serializer = RoboticUserSerializer(users, many=True)
