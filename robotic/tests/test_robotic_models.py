@@ -7,7 +7,7 @@ from django.contrib.auth import authenticate, login, logout
 class RoboticModelsTest(RoboticTestBase):
 
     def test_robotic_models_user_is_created_correct(self):
-        username = 'username_test'
+        username = 'matheus123'
         user = self.make_user(username=username)
         self.assertIs(1, user.id)
         self.assertIs(username, user.username)
@@ -15,8 +15,8 @@ class RoboticModelsTest(RoboticTestBase):
         #self.assertIs(1,1)
 
     def test_robotic_models_user_is_logging_correct(self):
-        username = 'username_test'
-        password = 'password_test'
+        username = 'matheus'
+        password = 'dragonmines'
         user = self.make_user(username=username, password=password)
         auth_user = authenticate(username=username, password=password)
 

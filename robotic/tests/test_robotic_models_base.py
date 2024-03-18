@@ -3,7 +3,7 @@ from ..models import RoboticUser
 
 class RoboticTestBase(TestCase):
     def setUp(self) -> None:
-            return super().setUp()
+        return super().setUp()
 
     def make_user(
         self,
@@ -20,7 +20,7 @@ class RoboticTestBase(TestCase):
         cpf = "12345678900",
         registration = "12345678900",
         profile_picture = None,
-        birth_date = None,
+        birth_date = '2006-07-30',
         level_access = 'Student',
         sex = 'M',
         school = None,

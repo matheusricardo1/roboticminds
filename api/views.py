@@ -7,6 +7,7 @@ from robotic.models import RoboticUser
 from api.serializers import RoboticUserSerializer
 from .validators import user_validator
 from django.contrib.auth.hashers import make_password
+import json
 
 
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
@@ -18,20 +19,33 @@ def users(request, id=0):
         return JsonResponse(user_serializer.data, safe=False)
 
     elif request.method == 'POST':
+        data_expected = {'username', 'email', 'cpf', 'registration', 'birth_date', 'level_access', 'sex', 'is_activated_by_admin'}
         user_data = JSONParser().parse(request)
-        user_serializer = RoboticUserSerializer(data=user_data)
-        if user_serializer.is_valid():
-            user_serializer.save()
-            return JsonResponse("Usuário cadastrado com sucesso!", safe=False)
-        return error(user_serializer.errors)
+        for data in user_data:
+            if data not in data_expected:
+                return JsonResponse(f"Json tem dados inesperados. É esperado: {data_expected}", safe=False)
+
+        user = RoboticUser.objects.filter(**user_data).order_by("-id")
+        if user is not None:
+            user_serializer = RoboticUserSerializer(user, many=True)
+            return JsonResponse(user_serializer.data, safe=False)
+            #return JsonResponse(user_serializer, safe=False)
+        else:
+            return JsonResponse("Json tem dados indejesados", safe=False)
     
     elif request.method == 'PUT':
+        data_expected = {'id', 'username', 'password', "email", "cpf", "registration", "birth_date", "level_access", "sex", 'profile_picture', 'full_name', 'mini_bio', 'school', 'is_activated_by_admin'}
         user_data = JSONParser().parse(request)
-        
+        for data in user_data:
+            if data not in data_expected:
+                return JsonResponse(f"Json tem dados inesperados. É esperado: {data_expected}", safe=False)
+
         user = get_object_or_404(RoboticUser, id=user_data.get('id'))
-        user_data['password'] = make_password(user_data['password'])
-        user.password = make_password(user.password)
-        user.save()
+        password = user_data.get('password', None)
+        if password is not None:
+            user_data['password'] = make_password(user_data['password'])
+            user.password = make_password(user.password)
+            user.save()
         user_serializer = RoboticUserSerializer(user, data=user_data, partial=True)
         if user_serializer.is_valid():
             user_serializer.save()
