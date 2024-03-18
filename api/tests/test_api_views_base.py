@@ -1,9 +1,22 @@
 from django.test import TestCase
+import base64
+import os
 import json
+
 
 class APIViewTestBase(TestCase):
     def setUp(self) -> None:
         return super().setUp()
+
+
+    def image_to_base64(self, image_filename):
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        image_path = os.path.join(script_dir, image_filename)
+
+        with open(image_path, "rb") as image_file:
+            base64_string = base64.b64encode(image_file.read()).decode('utf-8')
+        return base64_string
+
 
     def make_user_login(self, username = 'matheus12345', password = 'dragonmines123'): 
         return {

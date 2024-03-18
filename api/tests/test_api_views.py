@@ -1,5 +1,6 @@
 from .test_api_views_base import APIViewTestBase
 from django.shortcuts import reverse
+from django.test import Client
 import json
 
 
@@ -61,3 +62,35 @@ class APIViewTest(APIViewTestBase):
         self.assertEqual(email_error, expected_message['other_fields']['email'])
         self.assertEqual(level_access_error, expected_message['other_fields']['level_access'])
         self.assertEqual(sex_error, expected_message['other_fields']['sex'])
+
+
+    def test_api_view_user_update_is_working(self):
+        user = json.dumps(self.make_user())
+
+        response = self.client.post(reverse('api:user_register'), user, content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+
+        base64_image = self.image_to_base64('test_image.jpg')
+
+        user_update = json.dumps({
+            "id": 1,
+            "username": "matheus",
+            "profile_picture": base64_image
+        })
+
+        print(response.content.decode('utf-8'))
+
+        response = self.client.put(reverse('api:users'), user_update, content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.post(reverse('api:users'), json.dumps({
+            "id": 1
+        }), content_type='application/json')
+        content = json.loads(response.content.decode('utf-8'))
+
+        profile_picture_url = ''
+
+        for user in content:
+            profile_picture_url = user['profile_picture']
+
+        self.assertEqual(profile_picture_url, '/media/JPG/matheus12345_profile_picture.jpg')    

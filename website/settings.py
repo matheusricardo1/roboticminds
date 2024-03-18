@@ -1,5 +1,6 @@
 from pathlib import Path
 import os
+from datetime import timedelta
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -21,6 +22,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'robotic',
     'api',
+    'django_cleanup.apps.CleanupConfig',
     'corsheaders',
     'rest_framework',
     'rest_framework_simplejwt',
@@ -48,6 +50,12 @@ REST_FRAMEWORK = {
 SIMPLE_JWT = {
     'SIGNING_KEY': SECRET_KEY, 
     'ALGORITHM': 'HS256', 
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': False
 }
 
 ROOT_URLCONF = 'website.urls'
@@ -136,5 +144,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 ROLEPERMISSIONS_MODULE = 'website.roles'
 
-
 DEBUG_TOOLBAR_PATCH_SETTINGS = False
+
+DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880

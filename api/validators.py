@@ -20,6 +20,7 @@ def check_expected_values(data, expected_keys, errors):
     
 
 def user_validator(user):
+    print(user)
     username = user.get('username', None) 
     password = user.get('password', None) 
     email = user.get('email', '') 
@@ -41,6 +42,7 @@ def user_validator(user):
 
     if birth_date is not None:
         try:
+            print(f"------{birth_date}")
             birth_date = datetime.strptime(birth_date, "%Y-%m-%d").date()
             # print(data.year-data.month-data.day)  # Saída: YYYY-MM-DD
 
