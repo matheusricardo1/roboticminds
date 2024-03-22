@@ -14,6 +14,8 @@ from io import BytesIO
 from django.core.files.base import ContentFile
 import imghdr
 from rest_framework.parsers import MultiPartParser
+from django.utils.text import slugify
+import os
 
 
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
@@ -28,10 +30,8 @@ def users(request, id=0):
         data_expected = {'id', 'username', 'email', 'cpf', 'registration', 'birth_date', 'level_access', 'sex', 'is_activated_by_admin'}
         #parser_classes = [MultiPartParser]
         #user_data = request.data
-
-        
         user_data = JSONParser().parse(request)
-        print(user_data)
+
         for data in user_data:
             if data not in data_expected:
                 return JsonResponse(f"Json tem dados inesperados. É esperado: {data_expected}", safe=False)
@@ -49,8 +49,6 @@ def users(request, id=0):
         parser_classes = [MultiPartParser]
         user_data = request.data
 
-        print(user_data)
-
         #user_data = JSONParser().parse(request)
         for data in user_data:
             if data not in data_expected:
@@ -60,27 +58,23 @@ def users(request, id=0):
    
         profile_picture = user_data.get('profile_picture', None)
         if profile_picture:
-            # Obter o arquivo de imagem
             image = request.FILES.get('profile_picture')
-            # Novo nome do arquivo
-            new_filename = f"{user.username}_profile_picture.jpg"
-            username = slugify(instance.username)
-            ext = os.path.splitext(instance.profile_picture.name)
-            ext = ext[-1]
-            ext = ext.replace('.','')
+            file_name = image.name
+            username = slugify(user.username) 
+            
+            ext = os.path.splitext(file_name)[1]
+            ext = ext.replace('.', '')
             file_ext_name = ext.upper()
-            instance.profile_picture.name = f"{file_ext_name}/{username}_profile_picture.{ext}"
-            # Salvar o arquivo com o novo nome
+
+            new_filename = f"{username}_profile_picture.{ext}"
             user.profile_picture.save(new_filename, image)
-            user_data.pop('profile_picture')
+            user_data.pop('profile_picture', None)
     
         password = user_data.get('password', None)
         if password is not None:
             user_data['password'] = make_password(user_data['password'])
             user.password = make_password(user.password)
             user.save()
-
-        user_data
 
         user_serializer = RoboticUserSerializer(user, data=user_data, partial=True)
         if user_serializer.is_valid():
