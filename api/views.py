@@ -47,7 +47,7 @@ def users(request, id=0):
     if request.method == 'PUT':
         data_expected = {'id', 'username', 'password', "email", "cpf", "registration", "birth_date", "level_access", "sex", 'profile_picture', 'full_name', 'mini_bio', 'school', 'is_activated_by_admin'}
         parser_classes = [MultiPartParser]
-        user_data = request.data
+        user_data = request.data.copy()
 
         #user_data = JSONParser().parse(request)
         for data in user_data:
@@ -57,17 +57,28 @@ def users(request, id=0):
         user = get_object_or_404(RoboticUser, id=user_data.get('id'))     
    
         profile_picture = user_data.get('profile_picture', None)
-        if profile_picture:
-            image = request.FILES.get('profile_picture')
-            file_name = image.name
-            username = slugify(user.username) 
-            
-            ext = os.path.splitext(file_name)[1]
-            ext = ext.replace('.', '')
-            file_ext_name = ext.upper()
 
-            new_filename = f"{username}_profile_picture.{ext}"
-            user.profile_picture.save(new_filename, image)
+        if profile_picture is not None:
+            if user.profile_picture or profile_picture == 'delete':
+                if user.profile_picture and os.path.isfile(user.profile_picture.path):
+                    try:
+                        os.remove(user.profile_picture.path)
+                    except Exception as e:
+                        print(f"Error removing file: {e}")
+
+                user.profile_picture = None
+
+            if profile_picture != 'delete':
+                image = request.FILES.get('profile_picture')
+                file_name = image.name
+                username = slugify(user.username) 
+                        
+                ext = os.path.splitext(file_name)[1]    
+                ext = ext.replace('.', '')
+                file_ext_name = ext.upper() 
+                new_filename = f"{file_ext_name}/{username}_profile_picture.{ext}"
+                user.profile_picture.upload_to = 'profile_pictures/'
+                user.profile_picture.save(new_filename, image)
             user_data.pop('profile_picture', None)
     
         password = user_data.get('password', None)

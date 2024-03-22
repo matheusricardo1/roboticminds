@@ -2,7 +2,8 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinLengthValidator
 from datetime import date
-
+from django.utils.text import slugify
+import os
 
 class School(models.Model):
     name = models.CharField(max_length=255)
@@ -29,6 +30,20 @@ class RoboticUser(AbstractUser):
     sex = models.CharField(max_length=1, blank=True)
     school = models.ForeignKey(School, on_delete=models.CASCADE, blank=True, null=True) 
     is_activated_by_admin = models.BooleanField(default=False)
+
+
+    def save(self, *args, **kwargs):
+        if self.profile_picture:
+            username = slugify(self.username)
+            ext = os.path.splitext(self.profile_picture.name)[1]
+            ext = ext.replace('.', '')
+            file_ext_name = ext.upper()
+            new_filename = f"profile_pictures/{file_ext_name}/{username}_profile_picture.{ext}"
+            
+            if not self.profile_picture.name.startswith(new_filename):
+                self.profile_picture.name = new_filename
+
+        super(RoboticUser, self).save(*args, **kwargs)
 
 class Certificate(models.Model):
     user = models.ForeignKey(RoboticUser, on_delete=models.CASCADE)
