@@ -20,7 +20,6 @@ def check_expected_values(data, expected_keys, errors):
     
 
 def user_validator(user):
-    print(user)
     username = user.get('username', None) 
     password = user.get('password', None) 
     email = user.get('email', '') 
@@ -29,6 +28,7 @@ def user_validator(user):
     birth_date = user.get('birth_date', None)
     level_access = user.get('level_access', 'student')
     sex = user.get('sex', '')
+    profile_picture = user.get('profile_picture', None)
 
     errors = {
         "message": "Não foi possível modificar com sucesso!",
@@ -49,7 +49,7 @@ def user_validator(user):
         except ValueError as e:
            errors["errors"]["other_fields"]["birth_date"] = f"Data inválida! Recebido: {birth_date}, Formato Esperado: YYYY-MM-DD Error: {e}"
 
-    expected_keys = {'username', 'password', 'email', 'cpf', 'registration', 'birth_date', 'level_access', 'sex'}
+    expected_keys = {'username', 'password', 'email', 'cpf', 'registration', 'birth_date', 'level_access', 'sex', 'profile_picture'}
     errors = check_expected_values(user, expected_keys, errors)
 
     expected_keys = {'teacher', 'student', 'staff'}
@@ -57,6 +57,9 @@ def user_validator(user):
         errors["errors"]["other_fields"]["level_access_available"] = {
         "expected_keys": list(expected_keys)
     }
+
+    
+
 
     try:
         validate_password(password)
@@ -72,7 +75,8 @@ def user_validator(user):
             registration=registration,
             birth_date=birth_date,
             level_access=level_access,
-            sex=sex
+            sex=sex,
+            profile_picture=profile_picture
         )
         user_instance.full_clean() 
 
@@ -101,7 +105,8 @@ def user_validator(user):
             registration=registration,
             birth_date=birth_date,
             level_access=level_access,
-            sex=sex
+            sex=sex,
+            profile_picture=profile_picture
         )
         user_instance.password = make_password(password)
         user_instance.save()

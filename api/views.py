@@ -100,7 +100,27 @@ def users(request, id=0):
 
 @api_view(['POST'])
 def user_register(request):
-    user_data = JSONParser().parse(request)
+    data_expected = {'id', 'username', 'password', "email", "cpf", "registration", "birth_date", "level_access", "sex", 'profile_picture', 'full_name', 'mini_bio', 'school', 'is_activated_by_admin'}
+    parser_classes = [MultiPartParser]
+    user_data = request.data.copy()
+
+    #user_data = JSONParser().parse(request)
+    for data in user_data:
+        if data not in data_expected:
+            return JsonResponse(f"[{data}] Não Esperado. É esperado: {data_expected}", safe=False)
+
+    if user_data.get('username', None) is None:
+        return JsonResponse(f"Username Requerido", safe=False)
+
+    if user_data.get('password', None) is None:
+        return JsonResponse(f"Password Requerido", safe=False)
+
+    if user_data.get('birth_date', None) is None:
+        return JsonResponse(f"Birth_date Requerido", safe=False)
+
+
+
+
     user_validation = user_validator(user_data)
     #user_serializer = RoboticUserSerializer(data=user_data)
 
