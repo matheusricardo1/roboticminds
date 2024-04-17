@@ -8,17 +8,21 @@ from rest_framework.decorators import api_view # , permission_classes
 from rest_framework.parsers import JSONParser # , MultiPartParser
 from api.serializers import RoboticUserSerializer
 from robotic.models import RoboticUser
-from .validators import user_validator # , has_expected_data
+from .validators import user_validator
+from .pagination import UserAPIPagination
 
 
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
 #@permission_classes([IsAuthenticated])
 def users(request, id=0):
     if request.method == 'GET':
+        paginator = UserAPIPagination()
         list_users = RoboticUser.objects.all().order_by("-id")
+        result_page = paginator.paginate_queryset(list_users, request)
+
         if list_users.count() == 0:
             return JsonResponse("Nenhum usuário no sistema", safe=False)
-        user_serializer = RoboticUserSerializer(list_users, many=True)
+        user_serializer = RoboticUserSerializer(result_page, many=True)
         return JsonResponse(user_serializer.data, safe=False)
 
     if request.method == 'POST':
@@ -29,11 +33,11 @@ def users(request, id=0):
 
         for data in user_data:
             if data not in data_expected:
-                return JsonResponse(f"Json tem dados inesperados. É esperado: {data_expected}", safe=False)
+                return JsonResponse(f"Json tem dados inesperados. É esperado: {data_expected}", safe=False, status=400)
         user = RoboticUser.objects.filter(**user_data).order_by("-id")
 
         if user is None:
-            return JsonResponse("Json tem dados indejesados", safe=False)
+            return JsonResponse("Json tem dados indejesados", safe=False, status=400)
         user_serializer = RoboticUserSerializer(user, many=True)
         return JsonResponse(user_serializer.data, safe=False)
 
@@ -42,19 +46,20 @@ def users(request, id=0):
         # parser_classes = [MultiPartParser]
         user_data = request.data.copy()
         user_id = user_data.get('id', None)
+        
         if user_id is None:
-            return JsonResponse(f"Id é Obrigatório, é esperado: {data_expected}", safe=False)
+            return JsonResponse(f"Id é Obrigatório, é esperado: {data_expected}", safe=False, status=400)
         try:
             user = RoboticUser.objects.get(id=user_id)
         except Exception as e:
-            return JsonResponse("Usuário não encontrado!", safe=False)
+            return JsonResponse("Usuário não encontrado!", safe=False, status=404)
 
         if len(user_data) == 1:
-            return JsonResponse(f"Id do usuário foi fornecido, mas não foi fornecido os campos e seus respectivos novos valores, é esperado: {data_expected}", safe=False)
+            return JsonResponse(f"Id do usuário foi fornecido, mas não foi fornecido os campos e seus respectivos novos valores, é esperado: {data_expected}", safe=False, status=400)
 
         for data in user_data:
             if data not in data_expected:
-                return JsonResponse(f"Json tem dados inesperados. É esperado: {data_expected}", safe=False)
+                return JsonResponse(f"Json tem dados inesperados. É esperado: {data_expected}", safe=False, status=400)
 
         profile_picture = user_data.get('profile_picture', None)
 
@@ -79,7 +84,7 @@ def users(request, id=0):
                 user.profile_picture.upload_to = 'profile_pictures/'
                 user.profile_picture.save(new_filename, image)
             user_data.pop('profile_picture', None)
-            
+
         password = user_data.get('password', None)
         if password is not None:
             user_data['password'] = make_password(user_data['password'])
@@ -93,8 +98,13 @@ def users(request, id=0):
         return error(user_serializer.errors)
 
     elif request.method == 'DELETE':
-        user = get_object_or_404(RoboticUser, id=id)
-        user.delete()
+        try:
+            user = RoboticUser.objects.get(id=id)
+            user.delete()
+        except Exception as e:
+            if id == 0:
+                return JsonResponse("ID é esperado via endpoint, ex: (/users/<id>/)", safe=False, status=400)
+            return JsonResponse("Usuário não encontrado!", safe=False, status=404)
         return JsonResponse("Usuário deletado com sucesso!", safe=False)
 
 
