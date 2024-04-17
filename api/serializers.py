@@ -16,6 +16,7 @@ class RoboticUserRegisterSerializer(rest_framework.serializers.ModelSerializer):
             #"sex",
         )
 
+
 class RoboticUserSerializer(rest_framework.serializers.ModelSerializer):
     class Meta:
         model = RoboticUser
@@ -23,18 +24,15 @@ class RoboticUserSerializer(rest_framework.serializers.ModelSerializer):
             'id',
             'username', 
             'password',
-
             "email",
             "cpf",
             "registration",
             "birth_date",
             "level_access",
             "sex",
-        
             'profile_picture',
             'full_name', 
             'mini_bio',
-      
             'school',           
             'is_activated_by_admin',      
         )

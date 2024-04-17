@@ -1,61 +1,61 @@
+import os
+from django.contrib.auth.hashers import make_password
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.parsers import JSONParser
-from rest_framework.permissions import IsAuthenticated
-from robotic.models import RoboticUser
-from api.serializers import RoboticUserSerializer
-from .validators import user_validator
-from django.contrib.auth.hashers import make_password
-import json
-import base64
-from PIL import Image
-from io import BytesIO
-from django.core.files.base import ContentFile
-import imghdr
-from rest_framework.parsers import MultiPartParser
 from django.utils.text import slugify
-import os
+from rest_framework.decorators import api_view # , permission_classes
+# from rest_framework.permissions import IsAuthenticated
+from rest_framework.parsers import JSONParser # , MultiPartParser
+from api.serializers import RoboticUserSerializer
+from robotic.models import RoboticUser
+from .validators import user_validator # , has_expected_data
 
 
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
 #@permission_classes([IsAuthenticated])
 def users(request, id=0):
     if request.method == 'GET':
-        users = RoboticUser.objects.all().order_by("-id")
-        user_serializer = RoboticUserSerializer(users, many=True)
+        list_users = RoboticUser.objects.all().order_by("-id")
+        if list_users.count() == 0:
+            return JsonResponse("Nenhum usuário no sistema", safe=False)
+        user_serializer = RoboticUserSerializer(list_users, many=True)
         return JsonResponse(user_serializer.data, safe=False)
 
-    elif request.method == 'POST':
+    if request.method == 'POST':
         data_expected = {'id', 'username', 'email', 'cpf', 'registration', 'birth_date', 'level_access', 'sex', 'is_activated_by_admin'}
-        #parser_classes = [MultiPartParser]
-        #user_data = request.data
+        # parser_classes = [MultiPartParser]
+        # user_data = request.data
         user_data = JSONParser().parse(request)
 
         for data in user_data:
             if data not in data_expected:
                 return JsonResponse(f"Json tem dados inesperados. É esperado: {data_expected}", safe=False)
-
         user = RoboticUser.objects.filter(**user_data).order_by("-id")
-        if user is not None:
-            user_serializer = RoboticUserSerializer(user, many=True)
-            return JsonResponse(user_serializer.data, safe=False)
-            #return JsonResponse(user_serializer, safe=False)
-        else:
+
+        if user is None:
             return JsonResponse("Json tem dados indejesados", safe=False)
-    
+        user_serializer = RoboticUserSerializer(user, many=True)
+        return JsonResponse(user_serializer.data, safe=False)
+
     if request.method == 'PUT':
         data_expected = {'id', 'username', 'password', "email", "cpf", "registration", "birth_date", "level_access", "sex", 'profile_picture', 'full_name', 'mini_bio', 'school', 'is_activated_by_admin'}
-        parser_classes = [MultiPartParser]
+        # parser_classes = [MultiPartParser]
         user_data = request.data.copy()
+        user_id = user_data.get('id', None)
+        if user_id is None:
+            return JsonResponse(f"Id é Obrigatório, é esperado: {data_expected}", safe=False)
+        try:
+            user = RoboticUser.objects.get(id=user_id)
+        except Exception as e:
+            return JsonResponse("Usuário não encontrado!", safe=False)
 
-        #user_data = JSONParser().parse(request)
+        if len(user_data) == 1:
+            return JsonResponse(f"Id do usuário foi fornecido, mas não foi fornecido os campos e seus respectivos novos valores, é esperado: {data_expected}", safe=False)
+
         for data in user_data:
             if data not in data_expected:
                 return JsonResponse(f"Json tem dados inesperados. É esperado: {data_expected}", safe=False)
 
-        user = get_object_or_404(RoboticUser, id=user_data.get('id'))     
-   
         profile_picture = user_data.get('profile_picture', None)
 
         if profile_picture is not None:
@@ -63,24 +63,23 @@ def users(request, id=0):
                 if user.profile_picture and os.path.isfile(user.profile_picture.path):
                     try:
                         os.remove(user.profile_picture.path)
-                    except Exception as e:
+                    except FileNotFoundError as e:
                         print(f"Error removing file: {e}")
-
                 user.profile_picture = None
 
             if profile_picture != 'delete':
                 image = request.FILES.get('profile_picture')
                 file_name = image.name
-                username = slugify(user.username) 
-                        
-                ext = os.path.splitext(file_name)[1]    
+                username = slugify(user.username)
+
+                ext = os.path.splitext(file_name)[1]
                 ext = ext.replace('.', '')
-                file_ext_name = ext.upper() 
+                file_ext_name = ext.upper()
                 new_filename = f"{file_ext_name}/{username}_profile_picture.{ext}"
                 user.profile_picture.upload_to = 'profile_pictures/'
                 user.profile_picture.save(new_filename, image)
             user_data.pop('profile_picture', None)
-    
+            
         password = user_data.get('password', None)
         if password is not None:
             user_data['password'] = make_password(user_data['password'])
@@ -98,36 +97,22 @@ def users(request, id=0):
         user.delete()
         return JsonResponse("Usuário deletado com sucesso!", safe=False)
 
+
 @api_view(['POST'])
 def user_register(request):
     data_expected = {'id', 'username', 'password', "email", "cpf", "registration", "birth_date", "level_access", "sex", 'profile_picture', 'full_name', 'mini_bio', 'school', 'is_activated_by_admin'}
-    parser_classes = [MultiPartParser]
+    # parser_classes = [MultiPartParser]
     user_data = request.data.copy()
 
-    #user_data = JSONParser().parse(request)
     for data in user_data:
         if data not in data_expected:
             return JsonResponse(f"[{data}] Não Esperado. É esperado: {data_expected}", safe=False)
 
-    if user_data.get('username', None) is None:
-        return JsonResponse(f"Username Requerido", safe=False)
-
-    if user_data.get('password', None) is None:
-        return JsonResponse(f"Password Requerido", safe=False)
-
-    if user_data.get('birth_date', None) is None:
-        return JsonResponse(f"Birth_date Requerido", safe=False)
-
-
-
-
     user_validation = user_validator(user_data)
-    #user_serializer = RoboticUserSerializer(data=user_data)
 
     if user_validation.get("errors", False):
         errors = user_validation["errors"]
         return JsonResponse(errors, status=400, safe=False)
-    #user_instance = user_serializer.save()
 
     return JsonResponse("Usuário cadastrado com sucesso!", safe=False)
 

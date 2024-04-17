@@ -39,7 +39,7 @@ class APIViewTest(APIViewTestBase):
             sex = 'MM'
         ))
 
-        response = self.client.post(reverse("api:user_register"), server_request, content_type='application/json')
+        response = self.client.post(reverse("api:user_register"), server_request, content_type='multipart/form-data')
         self.assertEqual(response.status_code, 400)
 
         expected_message = self.server_all_errors()

@@ -1,8 +1,8 @@
 from pathlib import Path
 import os
-import django_heroku
-import dj_database_url
 from datetime import timedelta
+import django_heroku
+# import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -131,7 +131,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_ROOT = os.path.join(BASE_DIR,'static')
-STATIC_URL = '/static/' 
+STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     BASE_DIR / "base_static/",
 ]
