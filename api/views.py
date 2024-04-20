@@ -16,30 +16,32 @@ from .pagination import UserAPIPagination
 #@permission_classes([IsAuthenticated])
 def users(request, id=0):
     if request.method == 'GET':
-        paginator = UserAPIPagination()
         list_users = RoboticUser.objects.all().order_by("-id")
-        result_page = paginator.paginate_queryset(list_users, request)
-
         if list_users.count() == 0:
             return JsonResponse("Nenhum usuário no sistema", safe=False)
+        paginator = UserAPIPagination()
+        result_page = paginator.paginate_queryset(list_users, request)
         user_serializer = RoboticUserSerializer(result_page, many=True)
-        return JsonResponse(user_serializer.data, safe=False)
+        return paginator.get_paginated_response(user_serializer.data)
 
     if request.method == 'POST':
         data_expected = {'id', 'username', 'email', 'cpf', 'registration', 'birth_date', 'level_access', 'sex', 'is_activated_by_admin'}
-        # parser_classes = [MultiPartParser]
-        # user_data = request.data
         user_data = JSONParser().parse(request)
 
         for data in user_data:
             if data not in data_expected:
                 return JsonResponse(f"Json tem dados inesperados. É esperado: {data_expected}", safe=False, status=400)
-        user = RoboticUser.objects.filter(**user_data).order_by("-id")
+        list_users = RoboticUser.objects.filter(**user_data).order_by("-id") 
+        paginator = UserAPIPagination()
 
-        if user is None:
+        if list_users is None:
             return JsonResponse("Json tem dados indejesados", safe=False, status=400)
-        user_serializer = RoboticUserSerializer(user, many=True)
-        return JsonResponse(user_serializer.data, safe=False)
+        if list_users.count() == 0:
+            return JsonResponse("Nenhum usuário encontrado", safe=False, status=404)
+        
+        result_page = paginator.paginate_queryset(list_users, request)
+        user_serializer = RoboticUserSerializer(result_page, many=True)
+        return paginator.get_paginated_response(user_serializer.data)
 
     if request.method == 'PUT':
         data_expected = {'id', 'username', 'password', "email", "cpf", "registration", "birth_date", "level_access", "sex", 'profile_picture', 'full_name', 'mini_bio', 'school', 'is_activated_by_admin'}
