@@ -1,5 +1,11 @@
 venv
 db.sqlite3
 backup
+
+__pycache__
 .idea
+.pytest_cache
 .vscode
+
+vscode
+api/views2
