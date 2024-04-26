@@ -68,7 +68,6 @@ class UserValidation(BaseUserValidation):
         if self.user_id is None:
             self.error = f'Id é Obrigatório, é esperado: {self.data_expected}'
             self.valid = False
-            
 
         try:
             self.user = RoboticUser.objects.get(id=self.user_id)
@@ -87,7 +86,7 @@ class UserValidation(BaseUserValidation):
 
     def __init__(self, request):
         self.request = request
-        self.data = request.data
+        self.data = request.data.copy()
 
         if self.request.method == "POST":
             self.filter_users_by_data()

@@ -217,6 +217,11 @@ class BaseUserValidation:
         if self.valid:
             return self.user
         return None
+    
+    def get_data(self):
+        if self.valid:
+            return self.data
+        return None
 
     def is_valid(self):
         if self.valid == None:
@@ -236,18 +241,22 @@ class BaseUserValidation:
 
     def picture_manager(self):
         self.valid = True
+        
         profile_picture = self.data.get('profile_picture', None)
+        #print(profile_picture)
 
         if profile_picture is not None:
             try:
                 if self.user.profile_picture or profile_picture == 'delete':
-                    if self.user.profile_picture and os.path.isfile(self.user.profile_picture.path):
+                    if profile_picture == 'delete' and os.path.isfile(self.user.profile_picture.path):
                         try:
                             os.remove(self.user.profile_picture.path)
                         except FileNotFoundError as e:
                             self.valid = False
                             print(f"Error removing file: {e}")
-                    self.user.profile_picture = None
+                    
+                    self.data.pop('profile_picture', None)
+                    self.user.save()
 
                 if profile_picture != 'delete':
                     image = self.request.FILES.get('profile_picture')
@@ -263,7 +272,7 @@ class BaseUserValidation:
                 self.data.pop('profile_picture', None)
             except Exception as e:
                 self.valid = False
-        return
+        
 
     def change_password(self):
         self.valid = True
@@ -275,5 +284,5 @@ class BaseUserValidation:
                 self.user.save()
             except Exception as e:
                 self.valid = False
-        return 
+         
 

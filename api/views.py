@@ -45,14 +45,15 @@ def users(request, id=0):
         user = UserValidation(request)
         if user.is_not_valid():
             return Response(user.get_error())
-
+        data = user.get_data()
         user = user.get_user()
-        user_serializer = RoboticUserSerializer(user, data=request.data, partial=True)
+
+        user_serializer = RoboticUserSerializer(user, data=data, partial=True)
         
         if user_serializer.is_valid():
             user_serializer.save()
             return Response("Usuário atualizado com sucesso!")
-        return error(user_serializer.errors)
+        return Response(user_serializer.errors)
 
     if request.method == 'DELETE':
         try:
