@@ -197,13 +197,13 @@ class CertificateAPI(APIView):
         return paginator.get_paginated_response(certificate_serializer.data)   
 
     def post(self, request, format=None):
-        certicates = CertificateSerializer(data=request.data)
+        certificates = CertificateSerializer(data=request.data)
         
-        if certicates.is_valid():
-            certicates.save()
+        if certificates.is_valid():
+            certificates.save()
             return Response("Certificado criado com sucesso!", status=201)
         
-        return Response(certicates.errors, status=400)
+        return Response(certificates.errors, status=400)
 
     def put(self, request, format=None):
         data = request.data
