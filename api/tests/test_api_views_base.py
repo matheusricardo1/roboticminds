@@ -15,7 +15,7 @@ class APIViewTestBase(TestCase):
             user_register = self.make_user()
 
         return self.client.post(
-            reverse("api:user_register"),
+            reverse("api:users"),
             user_register,
             content_type='application/json'
         )
@@ -24,9 +24,9 @@ class APIViewTestBase(TestCase):
         user_login = user
         if user is None:
             user_login = self.make_user_login()
-
+        print(user_login)
         return self.client.post(
-            reverse('get_token'), 
+            reverse('api:get_token'), 
             user_login, 
             content_type='application/json'
         )

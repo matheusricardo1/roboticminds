@@ -1,5 +1,6 @@
-from django.db import models
 import os
+from random import randint
+from django.db import models
 from datetime import date
 from django.contrib.auth.models import AbstractUser
 from django.utils.text import slugify
@@ -33,23 +34,54 @@ class RoboticUser(AbstractUser):
 
 
     def save(self, *args, **kwargs):
+        if self.is_superuser == True and self.level_access != "teacher":
+            self.level_access == "teacher"
+        if self.level_access == "teacher":
+            self.is_superuser = True
+        
+        if not self.cpf:
+            self.cpf = str(randint(00000000000, 99999999999))
+        if not self.registration:
+            self.registration = str(randint(00000000000, 99999999999))
+
         if self.profile_picture:
             username = slugify(self.username)
             ext = os.path.splitext(self.profile_picture.name)[1]
             ext = ext.replace('.', '')
             file_ext_name = ext.upper()
-            new_filename = f"profile_pictures/{file_ext_name}/{username}_profile_picture.{ext}"
-            
+            new_filename = f"{file_ext_name}/{username}_profile_picture.{ext}"
             if not self.profile_picture.name.startswith(new_filename):
                 self.profile_picture.name = new_filename
-
         super(RoboticUser, self).save(*args, **kwargs)
 
+
 class Certificate(models.Model):
+    name = models.CharField(max_length=255)
+    details = models.CharField(max_length=120)
+    start_date = models.DateField()
+    end_date = models.DateField()
+    city = models.CharField(max_length=255, default="Manacapuru")
+    hours = models.PositiveSmallIntegerField()
+    date = models.DateField(auto_now_add=True, null=True)
+    
+    def __str__(self):
+        return f'{self.name}'
+
+
+class CertificateAssignment(models.Model):
     user = models.ForeignKey(RoboticUser, on_delete=models.CASCADE)
-    key = models.CharField(max_length=255)
-    certificate_date = models.DateField(auto_now_add=True, null=True)
-    year = models.CharField(max_length=4)
+    certificate = models.ForeignKey(Certificate, on_delete=models.CASCADE)
+    key = models.CharField(max_length=255, unique=True, blank=True)
+    assignment_date = models.DateField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        if not self.key:
+            self.key = f'{randint(10000000, 99999999)}.{randint(1000000, 9999999)}.{randint(100000, 999999)}.{randint(0, 9)}.{randint(1000000000000000000, 9999999999999999999)}'
+        super(CertificateAssignment, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return f'{self.certificate.event_name} - {self.user.username}'
+
 
 class Phone(models.Model):
     number = models.CharField(max_length=15)

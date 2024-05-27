@@ -1,6 +1,12 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
-from .models import RoboticUser
+from .models import RoboticUser, Certificate
+
+
+class CertificateCreateFrom(forms.Form):
+    class Meta:
+        model = Certificate
+        fields = ('name', 'details', 'start_date', 'end_date', 'city', 'hours')
 
 
 class RoboticLoginForm(forms.Form):

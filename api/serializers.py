@@ -1,11 +1,11 @@
-import rest_framework
-from robotic.models import RoboticUser
+from rest_framework import serializers
+from robotic.models import RoboticUser, Certificate, CertificateAssignment
 
 
-class RoboticUserSerializer(rest_framework.serializers.ModelSerializer):
+class RoboticUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = RoboticUser
-        fields = (
+        fields = ( 
             'id',
             'username', 
             'password',
@@ -21,3 +21,16 @@ class RoboticUserSerializer(rest_framework.serializers.ModelSerializer):
             'school',           
             'is_activated_by_admin',      
         )
+
+
+class CertificateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Certificate
+        fields = ('id', 'name', 'details', 'start_date', 'end_date', 'city', 'hours')
+
+
+class CertificateAssignmentSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = CertificateAssignment
+        fields = '__all__'

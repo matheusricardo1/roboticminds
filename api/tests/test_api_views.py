@@ -12,7 +12,7 @@ class APIViewTest(APIViewTestBase):
     def test_api_view_login(self):
         response = self.register_and_login()
         json_response = json.loads(response.content.decode("utf-8"))
-
+        print(json_response)
         self.assertEqual(response.status_code, 200)
         self.assertIsInstance(json_response["refresh"], str)
         self.assertIsInstance(json_response["access"], str)
@@ -21,8 +21,8 @@ class APIViewTest(APIViewTestBase):
     def test_api_view_register_user_is_working(self):
         response = self.register()
 
-        expected_message = 'Usuário cadastrado com sucesso!'       
-        self.assertEqual(response.status_code, 200)
+        expected_message = 'Usuário criado com sucesso!'       
+        self.assertEqual(response.status_code, 201)
         self.assertEqual(json.loads(response.content), expected_message)
 
     def test_api_view_register_user_erros_validators_is_working(self):

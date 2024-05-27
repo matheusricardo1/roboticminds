@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .forms import RoboticUserCreationForm, RoboticUserChangeForm
-from .models import RoboticUser
+from .models import RoboticUser, Certificate, CertificateAssignment
 
 
 class RoboticUserAdmin(UserAdmin):
@@ -20,3 +20,5 @@ class RoboticUserAdmin(UserAdmin):
     search_fields = ('username', 'first_name', 'last_name', 'full_name', 'cpf', 'email', 'registration')
 
 admin.site.register(RoboticUser, RoboticUserAdmin)
+admin.site.register(Certificate)
+admin.site.register(CertificateAssignment)
