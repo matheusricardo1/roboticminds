@@ -7,84 +7,7 @@ from robotic.models import RoboticUser, Certificate, CertificateAssignment
 from api.serializers import RoboticUserSerializer, CertificateSerializer, CertificateAssignmentSerializer
 from api.pagination import UserAPIPagination, CertificateAPIPagination
 from api.validations import APIRequest, UserValidation, AuthValidation
-
 from .certificate_download import *
-
-
-@api_view(['GET', 'POST', 'PUT', 'DELETE'])
-#@permission_classes([IsAuthenticated])
-def users(request, id=0):
-    if request.method == 'GET':
-        list_users = RoboticUser.objects.all().order_by("-id")
-  
-        if list_users.count() == 0:
-            return Response("Nenhum usuário no sistema")
-
-        paginator = UserAPIPagination()
-        result_page = paginator.paginate_queryset(list_users, request)
-        user_serializer = RoboticUserSerializer(result_page, many=True)
-        return paginator.get_paginated_response(user_serializer.data)
-
-    if request.method == 'POST':
-        _request = APIRequest(request)
-        if _request.is_not_correct():
-            return Response(_request.get_unexpected_data_error())
-
-        list_users = UserValidation(request)
-        if list_users.is_not_valid():
-            return Response(list_users.get_error())
-
-        paginator = UserAPIPagination()
-        result_page = paginator.paginate_queryset(list_users.get_users(), request)
-        serializer = RoboticUserSerializer(result_page, many=True)
-
-        return paginator.get_paginated_response(serializer.data)
-
-    if request.method == 'PUT':
-        _request = APIRequest(request)
-        if _request.is_not_correct():
-            return Response(_request.get_unexpected_data_error())
-
-        user = UserValidation(request)
-        if user.is_not_valid():
-            return Response(user.get_error())
-        data = user.get_data()
-        user = user.get_user()
-
-        user_serializer = RoboticUserSerializer(user, data=data, partial=True)
-        
-        if user_serializer.is_valid():
-            user_serializer.save()
-            return Response("Usuário atualizado com sucesso!")
-        return Response(user_serializer.errors)
-
-    if request.method == 'DELETE':
-        try:
-            user = RoboticUser.objects.get(id=id)
-            user.delete()
-        except Exception as e:
-            if id == 0:
-                return Response("ID é esperado via endpoint, ex: (/users/<id>/)", status=400)
-            return Response("Usuário não encontrado!", status=404)
-        return Response("Usuário deletado com sucesso!")
-
-
-@api_view(['POST'])
-def user_register(request):
-    _request = APIRequest(request)
-    if _request.is_not_correct():
-        error = _request.get_unexpected_data_error()
-        return Response(error)
-
-    user = AuthValidation(request)
-
-    if user.is_not_valid():
-        return Response(user.get_errors())
-    
-    user.register()
-    if user.user_is_registed():
-        return Response('Usuário cadastrado com sucesso!')
-    return Response('Erro ao cadastrar!')
 
 
 class UserAuth(APIView):
@@ -266,10 +189,22 @@ class CertificateAssignmentAPI(APIView):
 
     def post(self, request, format=None):
         assignment_serializer = CertificateAssignmentSerializer(data=request.data)
-        
         if assignment_serializer.is_valid():
-            assignment_serializer.save()
-            return Response("Atribuição criada com sucesso!", status=201)
+            data = assignment_serializer.validated_data
+            user = data.get('user')
+            certificate = data.get('certificate')
+            try:
+                exists = CertificateAssignment.objects.get(user=user.id, certificate=certificate.id)
+                return Response("Atribuição não foi realizada com suscesso pois o certificado já está atruido ao usuário!", status=400)
+            except CertificateAssignment.DoesNotExist:
+                return Response("Atribuição não foi realizada com suscesso!", status=400)
+
+            if user.level_access == "teacher" and not exists:
+                return Response("Atribuição não foi realizada com suscesso pois o usuario fornecido é um professor!", status=400)
+
+            if assignment_serializer.is_valid():
+                assignment_serializer.save()
+                return Response("Atribuição criada com sucesso!", status=201)
         
         return Response(assignment_serializer.errors, status=400)
 
@@ -357,7 +292,6 @@ class ValidateCertificateAPI(APIView):
             return Response(response_data, status=200)
         except CertificateAssignment.DoesNotExist:
             return Response({"error": "Certificado não encontrado."}, status=404)
-
 
 
 def download_certificate(request, user_id):

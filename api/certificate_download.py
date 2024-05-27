@@ -22,12 +22,10 @@ def create_certificate_image():
     image = Image.open(image_path)
     
     try:
-        # Salvar a imagem em um buffer
         buffer = io.BytesIO()
         image.save(buffer, format="JPEG")
         buffer.seek(0)
         
-        # Criar uma resposta de arquivo para download
         response = FileResponse(buffer, as_attachment=True, filename='certificate.jpg')
         
         return response
