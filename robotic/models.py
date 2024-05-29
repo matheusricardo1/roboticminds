@@ -89,3 +89,39 @@ class Phone(models.Model):
     user_phone = models.ForeignKey(RoboticUser, on_delete=models.CASCADE)
 
 
+class Project(models.Model):
+    name = models.CharField(max_length=255)
+    description = models.TextField()
+    start_date = models.DateField()
+    end_date = models.DateField(blank=True, null=True)
+    status = models.CharField(max_length=50, choices=[('active', 'Active'), ('completed', 'Completed')], default='active')
+
+    def __str__(self):
+        return self.name
+
+class Event(models.Model):
+    name = models.CharField(max_length=255)
+    description = models.TextField()
+    date = models.DateField()
+    location = models.CharField(max_length=255)
+    
+    def __str__(self):
+        return self.name
+
+class UserProjectAssignment(models.Model):
+    user = models.ForeignKey(RoboticUser, on_delete=models.CASCADE)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    role = models.CharField(max_length=255)
+    assignment_date = models.DateField(auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.project.name} - {self.user.username}'
+
+class UserEventAssignment(models.Model):
+    user = models.ForeignKey(RoboticUser, on_delete=models.CASCADE)
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+    role = models.CharField(max_length=255)
+    assignment_date = models.DateField(auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.event.name} - {self.user.username}'

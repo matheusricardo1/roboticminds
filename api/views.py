@@ -1,3 +1,4 @@
+from django.contrib.auth.hashers import make_password
 from rest_framework.decorators import api_view # , permission_classes
 # from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
@@ -8,6 +9,7 @@ from api.serializers import RoboticUserSerializer, CertificateSerializer, Certif
 from api.pagination import UserAPIPagination, CertificateAPIPagination
 from api.validations import APIRequest, UserValidation, AuthValidation
 from .certificate_download import *
+
 
 
 class UserAuth(APIView):
@@ -41,15 +43,23 @@ class UsersAPI(APIView):
         return paginator.get_paginated_response(user_serializer.data)   
 
     def post(self, request, format=None):
-        user = RoboticUserSerializer(data=request.data)
-        
-        if user.is_valid():
-            user.save()
+        user_data = request.data.copy()
+        password = user_data.get('password')
+
+        if not password:
+            return Response({"password": ["Este campo é obrigatório."]}, status=400)
+
+        user_data['password'] = make_password(password) 
+
+        user_serializer = RoboticUserSerializer(data=user_data)
+
+        if user_serializer.is_valid():
+            user_serializer.save()
             return Response("Usuário criado com sucesso!", status=201)
-        return Response(user.errors, status=400)
+        return Response(user_serializer.errors, status=400)
 
     def put(self, request, format=None):
-        data = request.data
+        data = request.data.copy()
         try:
             pk = data['id']
             user = RoboticUser.objects.get(pk=pk)
@@ -59,7 +69,10 @@ class UsersAPI(APIView):
         if len(data) == 1:
             return Response("É preciso mais dados além do ID", status=400)
 
-        serializer = RoboticUserSerializer(user, data=request.data, partial=True)
+        if 'password' in data:
+            data['password'] = make_password(data['password'])
+
+        serializer = RoboticUserSerializer(user, data=data, partial=True)
 
         if serializer.is_valid():
             serializer.save()
