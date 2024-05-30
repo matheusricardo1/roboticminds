@@ -11,6 +11,9 @@ class School(models.Model):
     phone_contact = models.CharField(max_length=60, null=True)
     phone_number = models.CharField(max_length=15)
 
+
+
+
 class RoboticUser(AbstractUser):
     TEACHER = 'teacher'
     STAFF = 'staff'
@@ -54,6 +57,12 @@ class RoboticUser(AbstractUser):
                 self.profile_picture.name = new_filename
         super(RoboticUser, self).save(*args, **kwargs)
 
+class Phone(models.Model):
+    number = models.CharField(max_length=15)
+    whatsapp = models.BooleanField()
+    user_phone = models.ForeignKey(RoboticUser, on_delete=models.CASCADE)
+
+
 
 class Certificate(models.Model):
     name = models.CharField(max_length=255)
@@ -82,11 +91,6 @@ class CertificateAssignment(models.Model):
     def __str__(self):
         return f'{self.certificate.name} - {self.user.username}'
 
-
-class Phone(models.Model):
-    number = models.CharField(max_length=15)
-    whatsapp = models.BooleanField()
-    user_phone = models.ForeignKey(RoboticUser, on_delete=models.CASCADE)
 
 
 class Project(models.Model):

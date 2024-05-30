@@ -1,6 +1,5 @@
 from rest_framework import serializers
-from robotic.models import RoboticUser, Certificate, CertificateAssignment
-
+from robotic.models import RoboticUser, Certificate, CertificateAssignment, Project, Event, UserProjectAssignment, UserEventAssignment
 
 class RoboticUserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -30,7 +29,27 @@ class CertificateSerializer(serializers.ModelSerializer):
 
 
 class CertificateAssignmentSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = CertificateAssignment
+        fields = '__all__'
+
+
+class ProjectSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Project
+        fields = '__all__'
+
+class EventSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Event
+        fields = '__all__'
+
+class UserProjectAssignmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserProjectAssignment
+        fields = '__all__'
+
+class UserEventAssignmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserEventAssignment
         fields = '__all__'

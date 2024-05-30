@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .forms import RoboticUserCreationForm, RoboticUserChangeForm
-from .models import RoboticUser, Certificate, CertificateAssignment
+from .models import RoboticUser, Certificate, CertificateAssignment, Project, Event, UserProjectAssignment, UserEventAssignment
 
 
 class RoboticUserAdmin(UserAdmin):
@@ -22,3 +22,7 @@ class RoboticUserAdmin(UserAdmin):
 admin.site.register(RoboticUser, RoboticUserAdmin)
 admin.site.register(Certificate)
 admin.site.register(CertificateAssignment)
+admin.site.register(Project)
+admin.site.register(Event)
+admin.site.register(UserProjectAssignment)
+admin.site.register(UserEventAssignment)

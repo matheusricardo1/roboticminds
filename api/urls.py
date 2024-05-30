@@ -23,6 +23,19 @@ urlpatterns = [
     re_path(r'^user_certificate/filter/$', views.CertificateAssignmentFilterAPI.as_view(), name="user_certificate_filter"),
 
     path('download_certificate/<int:user_id>/', views.download_certificate, name='download_certificate'),
+
+    re_path(r'^projects/$', views.ProjectAPI.as_view(), name='projects_api'),
+    re_path(r'^projects/(?P<pk>\d+)/$', views.ProjectAPI.as_view(), name='project_detail_api'),
+
+    re_path(r'^events/$', views.EventAPI.as_view(), name='events_api'),
+    re_path(r'^events/(?P<pk>\d+)/$', views.EventAPI.as_view(), name='event_detail_api'),
+
+    re_path(r'^user_project/$', views.UserProjectAssignmentAPI.as_view(), name='user_project_api'),
+    re_path(r'^user_project/(?P<pk>\d+)/$', views.UserProjectAssignmentAPI.as_view(), name='user_project_assignment_detail_api'),
+
+    re_path(r'^user_event/$', views.UserEventAssignmentAPI.as_view(), name='user_event_api'),
+    re_path(r'^user_event/(?P<pk>\d+)/$', views.UserEventAssignmentAPI.as_view(), name='user_event_assignment_detail_api'),
+
     #re_path(r'^users/$', views.users, name="users"),
     #re_path(r'^users/([0-9]+)/$', views.users, name="users"),
     #re_path(r'^user/register/$', views.user_register, name="user_register"),

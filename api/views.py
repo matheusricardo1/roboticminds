@@ -2,10 +2,11 @@ from django.contrib.auth.hashers import make_password
 from rest_framework.decorators import api_view # , permission_classes
 # from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
+from rest_framework import status
 from rest_framework.response import Response
 
-from robotic.models import RoboticUser, Certificate, CertificateAssignment
-from api.serializers import RoboticUserSerializer, CertificateSerializer, CertificateAssignmentSerializer
+from robotic.models import RoboticUser, Certificate, CertificateAssignment, Project, Event, UserProjectAssignment, UserEventAssignment
+from api.serializers import RoboticUserSerializer, CertificateSerializer, CertificateAssignmentSerializer, ProjectSerializer, EventSerializer, UserProjectAssignmentSerializer, UserEventAssignmentSerializer
 from api.pagination import UserAPIPagination, CertificateAPIPagination
 from api.validations import APIRequest, UserValidation, AuthValidation
 from .certificate_download import *
@@ -315,3 +316,175 @@ def download_certificate(request, user_id):
     
     response = FileResponse(pdf_buffer, as_attachment=True, filename='certificate.pdf')
     return response
+
+
+class ProjectAPI(APIView):
+    def get(self, request, format=None):
+        projects = Project.objects.all().order_by("-start_date")
+        if not projects:
+            return Response("Nenhum projeto no sistema")
+        
+        serializer = ProjectSerializer(projects, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    def post(self, request, format=None):
+        serializer = ProjectSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response("Projeto criado com sucesso!", status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def put(self, request, format=None):
+        data = request.data
+        try:
+            pk = data['id']
+            project = Project.objects.get(pk=pk)
+        except Project.DoesNotExist:
+            return Response("Projeto não encontrado", status=status.HTTP_404_NOT_FOUND)
+
+        if len(data) == 1:
+            return Response("É preciso mais dados além do ID", status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = ProjectSerializer(project, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response("Projeto modificado com sucesso!", status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def delete(self, request, pk, format=None):
+        try:
+            project = Project.objects.get(pk=pk)
+        except Project.DoesNotExist:
+            return Response("Projeto não encontrado", status=status.HTTP_404_NOT_FOUND)
+
+        project.delete()
+        return Response("Projeto deletado com sucesso", status=status.HTTP_204_NO_CONTENT)
+
+
+class EventAPI(APIView):
+    def get(self, request, format=None):
+        events = Event.objects.all().order_by("-date")
+        if not events:
+            return Response("Nenhum evento no sistema")
+        
+        serializer = EventSerializer(events, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    def post(self, request, format=None):
+        serializer = EventSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response("Evento criado com sucesso!", status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def put(self, request, format=None):
+        data = request.data
+        try:
+            pk = data['id']
+            event = Event.objects.get(pk=pk)
+        except Event.DoesNotExist:
+            return Response("Evento não encontrado", status=status.HTTP_404_NOT_FOUND)
+
+        if len(data) == 1:
+            return Response("É preciso mais dados além do ID", status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = EventSerializer(event, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response("Evento modificado com sucesso!", status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def delete(self, request, pk, format=None):
+        try:
+            event = Event.objects.get(pk=pk)
+        except Event.DoesNotExist:
+            return Response("Evento não encontrado", status=status.HTTP_404_NOT_FOUND)
+
+        event.delete()
+        return Response("Evento deletado com sucesso", status=status.HTTP_204_NO_CONTENT)
+
+
+class UserProjectAssignmentAPI(APIView):
+    def get(self, request, format=None):
+        assignments = UserProjectAssignment.objects.all().order_by("-assignment_date")
+        if not assignments:
+            return Response("Nenhuma atribuição de projeto no sistema")
+        
+        serializer = UserProjectAssignmentSerializer(assignments, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    def post(self, request, format=None):
+        serializer = UserProjectAssignmentSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response("Atribuição de projeto criada com sucesso!", status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def put(self, request, format=None):
+        data = request.data
+        try:
+            pk = data['id']
+            assignment = UserProjectAssignment.objects.get(pk=pk)
+        except UserProjectAssignment.DoesNotExist:
+            return Response("Atribuição de projeto não encontrada", status=status.HTTP_404_NOT_FOUND)
+
+        if len(data) == 1:
+            return Response("É preciso mais dados além do ID", status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = UserProjectAssignmentSerializer(assignment, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response("Atribuição de projeto modificada com sucesso!", status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def delete(self, request, pk, format=None):
+        try:
+            assignment = UserProjectAssignment.objects.get(pk=pk)
+        except UserProjectAssignment.DoesNotExist:
+            return Response("Atribuição de projeto não encontrada", status=status.HTTP_404_NOT_FOUND)
+
+        assignment.delete()
+        return Response("Atribuição de projeto deletada com sucesso", status=status.HTTP_204_NO_CONTENT)
+
+
+class UserEventAssignmentAPI(APIView):
+    def get(self, request, format=None):
+        assignments = UserEventAssignment.objects.all().order_by("-assignment_date")
+        if not assignments:
+            return Response("Nenhuma atribuição de evento no sistema")
+        
+        serializer = UserEventAssignmentSerializer(assignments, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    def post(self, request, format=None):
+        serializer = UserEventAssignmentSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response("Atribuição de evento criada com sucesso!", status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def put(self, request, format=None):
+        data = request.data
+        try:
+            pk = data['id']
+            assignment = UserEventAssignment.objects.get(pk=pk)
+        except UserEventAssignment.DoesNotExist:
+            return Response("Atribuição de evento não encontrada", status=status.HTTP_404_NOT_FOUND)
+
+        if len(data) == 1:
+            return Response("É preciso mais dados além do ID", status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = UserEventAssignmentSerializer(assignment, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response("Atribuição de evento modificada com sucesso!", status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def delete(self, request, pk, format=None):
+        try:
+            assignment = UserEventAssignment.objects.get(pk=pk)
+        except UserEventAssignment.DoesNotExist:
+            return Response("Atribuição de evento não encontrada", status=status.HTTP_404_NOT_FOUND)
+
+        assignment.delete()
+        return Response("Atribuição de evento deletada com sucesso", status=status.HTTP_204_NO_CONTENT)
