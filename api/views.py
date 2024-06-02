@@ -114,7 +114,7 @@ class UsersFilterAPI(APIView):
         if 'is_activated_by_admin' in data:
             filters['is_activated_by_admin'] = data['is_activated_by_admin']
 
-        users = RoboticUser.objects.filter(**filters)
+        users = RoboticUser.objects.filter(**filters).order_by('-id')
         paginator = UserAPIPagination()
         result_page = paginator.paginate_queryset(users, request)
         user_serializer = RoboticUserSerializer(result_page, many=True)
