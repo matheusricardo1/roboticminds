@@ -10,6 +10,7 @@ urlpatterns = [
     re_path(r'^users/token/verify/$', TokenVerifyView.as_view()),
 
     re_path(r'^users/$', views.UsersAPI.as_view(),  name="users"),
+    re_path(r'^users/filter/$', views.UsersFilterAPI.as_view(),  name="users_filter"),
     re_path(r'^users/([0-9]+)/$', views.UsersAPI.as_view(),  name="users"),
     re_path(r'^user/register/$', views.UserAuth.as_view(), name="users_register"),
 
