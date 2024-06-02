@@ -22,6 +22,7 @@ class RoboticUserSerializer(serializers.ModelSerializer):
         )
 
 
+
 class CertificateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Certificate

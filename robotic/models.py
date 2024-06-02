@@ -28,7 +28,7 @@ class RoboticUser(AbstractUser):
     mini_bio = models.TextField(blank=True)
     cpf = models.CharField(max_length=11, blank=True, unique=True)
     registration = models.CharField(max_length=11, blank=True, unique=True)
-    profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
+    profile_picture = models.ImageField(blank=True, null=True)
     birth_date = models.DateField(default=date(2000, 1, 1), blank=True, null=True)
     level_access = models.CharField(max_length=20, choices=LEVEL_CHOICES, default=STUDENT)
     sex = models.CharField(max_length=1, blank=True)
@@ -47,14 +47,21 @@ class RoboticUser(AbstractUser):
         if not self.registration:
             self.registration = str(randint(00000000000, 99999999999))
 
-        if self.profile_picture:
+       
+        # Verifica se há uma nova imagem sendo carregada
+        if self.pk and self.profile_picture and not self.profile_picture.name.startswith('profile_pictures/'):
+            old_instance = RoboticUser.objects.get(pk=self.pk)
+            if old_instance.profile_picture and old_instance.profile_picture != self.profile_picture:
+                # Remove a imagem antiga
+                old_instance.profile_picture.delete(save=False)
+
+            # Renomeia a nova imagem
             username = slugify(self.username)
             ext = os.path.splitext(self.profile_picture.name)[1]
             ext = ext.replace('.', '')
-            file_ext_name = ext.upper()
-            new_filename = f"{file_ext_name}/{username}_profile_picture.{ext}"
-            if not self.profile_picture.name.startswith(new_filename):
-                self.profile_picture.name = new_filename
+            new_filename = f"profile_pictures/{username}_profile_picture.{ext}"
+
+            self.profile_picture.name = new_filename
         super(RoboticUser, self).save(*args, **kwargs)
 
 class Phone(models.Model):
