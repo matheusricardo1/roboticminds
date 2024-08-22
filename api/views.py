@@ -1,12 +1,20 @@
 from django.contrib.auth.hashers import make_password
+from django.db.models import Q
 from rest_framework.decorators import api_view # , permission_classes
 # from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
+from rest_framework_simplejwt.views import TokenRefreshView
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
+from rest_framework import status
+from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
+from django.core.mail import send_mail
+from django.conf import settings
 
 from robotic.models import RoboticUser, Certificate, CertificateAssignment, Project, Event, UserProjectAssignment, UserEventAssignment
-from api.serializers import RoboticUserSerializer, CertificateSerializer, CertificateAssignmentSerializer, ProjectSerializer, EventSerializer, UserProjectAssignmentSerializer, UserEventAssignmentSerializer
+from api.serializers import PublicRoboticUserSerializer, RoboticUserSerializer, CertificateSerializer, CertificateAssignmentSerializer, ProjectSerializer, EventSerializer, UserProjectAssignmentSerializer, UserEventAssignmentSerializer
 from api.pagination import UserAPIPagination, CertificateAPIPagination
 from api.validations import APIRequest, UserValidation, AuthValidation
 from .certificate_download import *
@@ -30,8 +38,40 @@ class UserAuth(APIView):
             return Response('Usuário cadastrado com sucesso!')
         return Response('Erro ao cadastrar!')
 
+class UsersPublicAPI(APIView):
+    permission_classes = [AllowAny]
+    def get(self, request, format=None):
+        list_users = RoboticUser.objects.all().order_by("-id")
+  
+        if list_users.count() == 0:
+            return Response("Nenhum usuário no sistema")
+
+        user_serializer = PublicRoboticUserSerializer(list_users, many=True)
+        return Response(user_serializer.data)
+
+class UsersPublicFilterAPI(APIView):
+    permission_classes = [AllowAny]
+    def post(self, request, format=None):
+        data = request.data.copy()      
+        filters = {}
+
+        if 'id' in data:
+            filters['id'] = data['id']
+        if 'full_name' in data:
+            filters['full_name__icontains'] = data['full_name']
+        if 'mini_bio' in data:
+            filters['mini_bio__icontains'] = data['mini_bio']
+        if 'level_access' in data:
+            filters['level_access'] = data['level_access']
+        
+        users = RoboticUser.objects.filter(**filters).order_by('-id')
+        user_serializer = PublicRoboticUserSerializer(users, many=True)
+        return Response(user_serializer.data)
+        
 
 class UsersAPI(APIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
     def get(self, request, format=None):
         list_users = RoboticUser.objects.all().order_by("-id")
   
@@ -55,14 +95,15 @@ class UsersAPI(APIView):
         user_serializer = RoboticUserSerializer(data=user_data)
 
         if user_serializer.is_valid():
-            user_serializer.save()
+            #user_serializer.save()
             return Response("Usuário criado com sucesso!", status=201)
         return Response(user_serializer.errors, status=400)
 
     def put(self, request, format=None):
         data = request.data.copy()
         try:
-            pk = data['id']
+            print(data)
+            pk = data['id'] 
             user = RoboticUser.objects.get(pk=pk)
         except RoboticUser.DoesNotExist:
             return Response("Usuário não encontrado", status=404)
@@ -76,6 +117,8 @@ class UsersAPI(APIView):
         serializer = RoboticUserSerializer(user, data=data, partial=True)
 
         if serializer.is_valid():
+            modified = serializer.validated_data
+            print(modified, request.user)
             serializer.save()
             return Response("Usuário modificado com sucesso!", status=200)
 
@@ -93,6 +136,20 @@ class UsersAPI(APIView):
 
 
 class UsersFilterAPI(APIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
+    def get(self, request, format=None):
+        if request.user.is_authenticated:
+            print("User está logado")
+            print("User ID: ", request.user.id)
+            users = RoboticUser.objects.get(id=request.user.id)
+            print("User: ", users)
+            user_serializer = RoboticUserSerializer(users)
+            print(user_serializer.data)
+            return Response(user_serializer.data) 
+        else:
+            return Response("Não está logado") 
+
     def post(self, request, format=None):
         data = request.data
         filters = {}
@@ -122,6 +179,7 @@ class UsersFilterAPI(APIView):
 
 
 class CertificateAPI(APIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
     def get(self, request, format=None):
         list_certificates = Certificate.objects.all().order_by("-date")
   
@@ -134,8 +192,8 @@ class CertificateAPI(APIView):
         return paginator.get_paginated_response(certificate_serializer.data)   
 
     def post(self, request, format=None):
-        certificates = CertificateSerializer(data=request.data)
-        
+        certificates = CertificateSerializer(data=request.data.copy())
+        print(request.data.copy())
         if certificates.is_valid():
             certificates.save()
             return Response("Certificado criado com sucesso!", status=201)
@@ -205,10 +263,10 @@ class CertificateAssignmentAPI(APIView):
         assignment_serializer = CertificateAssignmentSerializer(data=request.data)
         if assignment_serializer.is_valid():
             data = assignment_serializer.validated_data
-            user = data.get('user')
-            certificate = data.get('certificate')
+            user = data.get('user') # type: ignore
+            certificate = data.get('certificate') # type: ignore
             try:
-                exists = CertificateAssignment.objects.get(user=user.id, certificate=certificate.id)
+                exists = CertificateAssignment.objects.get(user=user.id, certificate=certificate.id) # type: ignore
                 return Response("Atribuição não foi realizada com suscesso pois o certificado já está atruido ao usuário!", status=400)
             except CertificateAssignment.DoesNotExist:
                 return Response("Atribuição não foi realizada com suscesso!", status=400)
@@ -288,13 +346,13 @@ class ValidateCertificateAPI(APIView):
             certificate = assignment.certificate
             response_data = {
                 "user": {
-                    "id": user.id,
+                    "id": user.id, # type: ignore
                     "username": user.username,
                     "full_name": user.full_name,
                     "cpf": user.cpf,
                 },
                 "certificate": {
-                    "id": certificate.id,
+                    "id": certificate.id, # type: ignore
                     "name": certificate.name,
                     "details": certificate.details,
                     "start_date": certificate.start_date,
@@ -488,3 +546,68 @@ class UserEventAssignmentAPI(APIView):
 
         assignment.delete()
         return Response("Atribuição de evento deletada com sucesso", status=status.HTTP_204_NO_CONTENT)
+
+
+class SendEmailView(APIView):
+    def get (self, request, format=None):
+        user_certificates = CertificateAssignment.objects.all().order_by('-id')
+        CertificateAssignmentSerializer(user_certificates, many=True)
+        return Response()
+    def post(self, request, format=None):
+        #subject = request.data.get('subject')
+        #message = request.data.get('message')
+        #recipient_list = request.data.get('recipient_list')
+
+        subject = "Teste de Email"
+        message = "Este é um teste de email."
+        recipient_list = ["matheusricardooliveriralima@gmail.com"]
+
+        #"subject": "Teste de Email",
+        #"message": "Este é um teste de email.",
+        #"recipient_list": ["destinatario_exemplo@gmail.com"]
+
+        #if not subject or not message or not recipient_list:
+        #    return Response({"error": "Todos os campos são obrigatórios."}, status=status.HTTP_400_BAD_REQUEST)
+
+        
+        try:
+            send_mail(
+                subject,
+                message,
+                settings.EMAIL_HOST_USER,
+                recipient_list,
+                fail_silently=False,
+            )
+            return Response({"success": "Email enviado com sucesso."}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+class AutoTokenRefreshView(TokenRefreshView):
+    def post(self, request, *args, **kwargs):
+        # Verifique se o corpo da solicitação contém o token de refresh
+        refresh_token = request.data.get('refresh') # type: ignore
+        
+        if not refresh_token:
+            return Response({'detail': 'Refresh token is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Tente validar o token de refresh
+        serializer = self.get_serializer(data={'refresh': refresh_token})
+        try:
+            serializer.is_valid(raise_exception=True)
+        except TokenError as e:
+            raise InvalidToken(e.args[0])
+
+        try:
+            refresh = RefreshToken(refresh_token) # type: ignore
+        except TokenError:
+            return Response({'detail': 'Invalid refresh token'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Gere novos tokens de acesso e refresh
+        data = {
+            'access': str(refresh.access_token),
+            'refresh': str(refresh)
+        }
+
+        return Response(data)

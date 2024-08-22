@@ -21,6 +21,18 @@ class RoboticUserSerializer(serializers.ModelSerializer):
             'is_activated_by_admin',      
         )
 
+class PublicRoboticUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RoboticUser
+        fields = ( 
+            'id',
+            'username', 
+            "email",
+            'profile_picture',
+            'full_name', 
+            'mini_bio',
+        )
+
 
 
 class CertificateSerializer(serializers.ModelSerializer):

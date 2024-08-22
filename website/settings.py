@@ -56,7 +56,7 @@ SIMPLE_JWT = {
     'ALGORITHM': 'HS256', 
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
-    'ROTATE_REFRESH_TOKENS': False
+    'ROTATE_REFRESH_TOKENS': True, 
 }
 
 ROOT_URLCONF = 'website.urls'
@@ -150,3 +150,12 @@ ROLEPERMISSIONS_MODULE = 'website.roles'
 DEBUG_TOOLBAR_PATCH_SETTINGS = False
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+EMAIL_HOST_USER = 'matheusricardo164@gmail.com'
+EMAIL_HOST_PASSWORD = 'dpoz dzpq wfmt dysw'

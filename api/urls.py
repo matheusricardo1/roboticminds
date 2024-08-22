@@ -1,13 +1,16 @@
 from django.urls import path, re_path
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView, TokenViewBase
 from . import views
 
 app_name = 'api'
 
 urlpatterns = [
     re_path(r'^users/token/$', TokenObtainPairView.as_view(), name="get_token"),
-    re_path(r'^users/token/refresh/$', TokenRefreshView.as_view(), name="refresh_token"),
+    re_path(r'^users/token/refresh/$', views.AutoTokenRefreshView.as_view(), name="refresh_token"),
     re_path(r'^users/token/verify/$', TokenVerifyView.as_view()),
+
+    re_path(r'^users/public/$', views.UsersPublicAPI.as_view(),  name="public_users"),
+    re_path(r'^users/public/filter/$', views.UsersPublicFilterAPI.as_view(),  name="public_users_filter"),
 
     re_path(r'^users/$', views.UsersAPI.as_view(),  name="users"),
     re_path(r'^users/filter/$', views.UsersFilterAPI.as_view(),  name="users_filter"),
@@ -36,6 +39,8 @@ urlpatterns = [
 
     re_path(r'^user_event/$', views.UserEventAssignmentAPI.as_view(), name='user_event_api'),
     re_path(r'^user_event/(?P<pk>\d+)/$', views.UserEventAssignmentAPI.as_view(), name='user_event_assignment_detail_api'),
+
+    path('send-email/', views.SendEmailView.as_view(), name='send_email'),
 
     #re_path(r'^users/$', views.users, name="users"),
     #re_path(r'^users/([0-9]+)/$', views.users, name="users"),

@@ -50,7 +50,7 @@ class UserValidation(BaseUserValidation):
                 char_fields.append(field.name)
             if field.choices:
                 choices_fields.append(field.name)
-            if field.unique and field.name not in exception_fields:
+            if field.unique and field.name not in exception_fields: # type: ignore
                 unique_fields.append(field.name)
 
         for (key, value) in self.data.items():

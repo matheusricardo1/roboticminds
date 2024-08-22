@@ -11,9 +11,6 @@ class School(models.Model):
     phone_contact = models.CharField(max_length=60, null=True)
     phone_number = models.CharField(max_length=15)
 
-
-
-
 class RoboticUser(AbstractUser):
     TEACHER = 'teacher'
     STAFF = 'staff'
@@ -69,8 +66,6 @@ class Phone(models.Model):
     whatsapp = models.BooleanField()
     user_phone = models.ForeignKey(RoboticUser, on_delete=models.CASCADE)
 
-
-
 class Certificate(models.Model):
     name = models.CharField(max_length=255)
     details = models.CharField(max_length=120)
@@ -83,12 +78,12 @@ class Certificate(models.Model):
     def __str__(self):
         return f'{self.name}'
 
-
 class CertificateAssignment(models.Model):
     user = models.ForeignKey(RoboticUser, on_delete=models.CASCADE)
     certificate = models.ForeignKey(Certificate, on_delete=models.CASCADE)
     key = models.CharField(max_length=255, unique=True, blank=True)
     assignment_date = models.DateField(auto_now_add=True)
+    sended = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         if not self.key:
@@ -97,8 +92,6 @@ class CertificateAssignment(models.Model):
 
     def __str__(self):
         return f'{self.certificate.name} - {self.user.username}'
-
-
 
 class Project(models.Model):
     name = models.CharField(max_length=255)
@@ -136,3 +129,4 @@ class UserEventAssignment(models.Model):
 
     def __str__(self):
         return f'{self.event.name} - {self.user.username}'
+
